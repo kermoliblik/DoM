@@ -1,6 +1,8 @@
 var data;
 var task;
 var shop;
+var adSolve;
+var itmBght;
 document.getElementById("start").addEventListener('click', loadData);
 // new game and stores game data at var data
 function loadData() {
@@ -9,19 +11,19 @@ function loadData() {
     xhr.onload=function() {
         if(this.status===200){
             window.data = JSON.parse(xhr.responseText);
-                output = `
-                <ul>
-                    <li>Game ID: ${window.data.gameId}</li>
-                    <li>Lives: ${window.data.lives}</li>
-                    <li>Gold: ${window.data.gold}</li>
-                    <li>Level: ${window.data.level}</li>
-                    <li>Score: ${window.data.score}</li>
-                    <li>Highscore: ${window.data.highScore}</li>
-                    <li>Turn: ${window.data.turn}</li>
-                </ul>
-            `;
+            out1 = `Lives: ${window.data.lives}`;
+            out2 = `Gold: ${window.data.gold}`;
+            out3 = `Score: ${window.data.score}`;
+            out4 = `Turns: ${window.data.turn}`;
+            out5 = 'Level: 0';
+            out6 = `Highscore: ${window.data.highScore}`;
+            document.getElementById('uLives').innerHTML = out1;
+            document.getElementById('uGold').innerHTML = out2;
+            document.getElementById('uScore').innerHTML = out3;
+            document.getElementById('uTurn').innerHTML = out4;
+            document.getElementById('uLevel').innerHTML = out5;
+            document.getElementById('uHS').innerHTML = out6;
         };
-        document.getElementById('outputTXT2').innerHTML = output;
     }
     xhr.onerror=function(){
         console.log('request error...');
@@ -68,7 +70,6 @@ function loadShop() {
             window.shop = JSON.parse(xhr.responseText);
             let output1 = '';
             sLen = window.shop.length;
-            alert(sLen);
             for(var i = 0; i < sLen; i++){
                 output1 += `
                 <ul>
@@ -97,9 +98,20 @@ function solveTask(){
     xhr.open('POST', `https://www.dragonsofmugloar.com/api/v2/${window.data.gameId}/solve/${adSel}`, true);
     xhr.onload=function() {
         if(this.status===200){
-            alert(this.responseText);
-            var adSolve = JSON.parse(xhr.responseText);
-            console.log(adSolve);
+            window.adSolve = JSON.parse(xhr.responseText);
+            if(window.adSolve.success === true){
+                alert("ad completed")
+            }else {
+                alert("You failed and lost a life")
+            };
+            out1 = `Lives: ${window.adSolve.lives}`;
+            out2 = `Gold: ${window.adSolve.gold}`;
+            out3 = `Score: ${window.adSolve.score}`;
+            out4 = `Turns: ${window.adSolve.turn}`;
+            document.getElementById('uLives').innerHTML = out1;
+            document.getElementById('uGold').innerHTML = out2;
+            document.getElementById('uScore').innerHTML = out3;
+            document.getElementById('uTurn').innerHTML = out4;
         }
     }
     xhr.onerror=function(){
@@ -107,6 +119,9 @@ function solveTask(){
     }
     xhr.send();
     loadTasks();
+    return window.adSolve;
+        
+    
 }
 
 // function for buying items from shop
@@ -117,8 +132,21 @@ function buyItems(){
     xhr.open('POST',`https://www.dragonsofmugloar.com/api/v2/${window.data.gameId}/shop/buy/${itmBuy}`, true);
     xhr.onload=function() {
         if(this.status===200){
-            alert(this.responseText);
-            var itmBght =JSON.parse(xhr.responseText);
+            console.log(this.responseText);
+            window.itmBght =JSON.parse(xhr.responseText);
+            if(window.itmBght.shoppingSuccess === true){
+                alert("Item bought")
+            }else {
+                alert("u dont have enough funds")
+            };
+                out1 = `Lives: ${window.itmBght.lives}`;
+                out2 = `Gold: ${window.itmBght.gold}`;
+                out3 = `Level: ${window.itmBght.level}`;
+                out4 = `Turns: ${window.itmBght.turn}`;
+                document.getElementById('uLives').innerHTML = out1;
+                document.getElementById('uGold').innerHTML = out2;
+                document.getElementById('uLevel').innerHTML = out3;
+                document.getElementById('uTurn').innerHTML = out4;
         }
     }
     xhr.onerror=function(){
@@ -126,7 +154,32 @@ function buyItems(){
     }
     xhr.send();
     loadShop();
+    return window.itmBght;
 }
+
+//something to show player game satas and make them update after solving ads and item purchase
+/*function upAfterAd(){
+    out1 = `Lives: ${window.adSolve.lives}`;
+    out2 = `Gold: ${window.adSolve.gold}`;
+    out3 = `Score: ${window.adSolve.score}`;
+    out4 = `Turns: ${window.adSolve.turn}`;
+    document.getElementById('uLives').innerHTML = out1;
+    document.getElementById('uGold').innerHTML = out2;
+    document.getElementById('uScore').innerHTML = out3;
+    document.getElementById('uTurn').innerHTML = out4;
+    
+}
+
+function upAfterBuy(){
+    out1 = `Lives: ${window.itmBght.lives}`;
+    out2 = `Gold: ${window.itmBght.gold}`;
+    out3 = `Level: ${window.itmBght.level}`;
+    out4 = `Turns: ${window.itmBght.turn}`;
+    document.getElementById('uLives').innerHTML = out1;
+    document.getElementById('uGold').innerHTML = out2;
+    document.getElementById('uLevel').innerHTML = out3;
+    document.getElementById('uTurn').innerHTML = out4;
+}*/
 
 document.getElementById("ads").addEventListener('click', loadTasks);
 document.getElementById("shop").addEventListener('click', loadShop);
